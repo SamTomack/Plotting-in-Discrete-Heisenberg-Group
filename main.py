@@ -1,28 +1,27 @@
 import random
 from itertools import product
-import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 
 vectors = []
 combSet = []
 
-m = 7
+m = 10
 
 #To use predetermined matrices
-'''
-a0 = [1,0,-5] #[a,b,c]
-a1 = [2,-3,1]
-a2 = [8,-1,5]
-a3 = [-3,2,1]
-a4= [4,5,2]
 
-vectors.append(a0)
-vectors.append(a1)
-vectors.append(a2)
-vectors.append(a3)
-vectors.append(a4)
-'''
+#a0 = [1,1,-1] #[a,b,c]
+#a1 = [-1,1,3]
+#a2 = [8,-1,5]
+#a3 = [-3,2,1]
+#a4= [4,5,2]
+
+#vectors.append(a0)
+#vectors.append(a1)
+#vectors.append(a2)
+#vectors.append(a3)
+#vectors.append(a4)
+
 
 def generateRandomMatrices(n):
     L = []
@@ -33,7 +32,7 @@ def generateRandomMatrices(n):
         L.append([a,b,c])
     return L
 
-vectors = generateRandomMatrices(5)
+vectors = generateRandomMatrices(2)
 
 def add(L1, L2):
     a = (L1[0] + L2[0])
@@ -56,8 +55,8 @@ def removeDuplicates(L):
     return T2
 
 def multiComb(arr, m):
-    L = list(product('01234', repeat = 7))
-                    #0 through m-1, m
+    L = list(product('01', repeat = 10))
+                    #'0 through m-1', repeat = m
     sumList = []
     for i in range(0, len(L)):
         sum = [0, 0, 0]
@@ -83,9 +82,31 @@ view.addItem(zgrid)
 xgrid.rotate(90, 0, 1, 0)
 ygrid.rotate(90, 1, 0, 0)
 
-points = gl.GLScatterPlotItem(pos=combSet, color=(1,1,1,1), size=0.1, pxMode=False)
+points = gl.GLScatterPlotItem(pos=combSet, color=(1,1,1,1), size=0.05, pxMode=False)
 initials = gl.GLScatterPlotItem(pos=vectors, color=(.5,1,.5,1), size=1, pxMode=False)
-view.addItem(points)
-view.addItem(initials)
 
+pointSet1 = []
+pointSet2 = []
+for i in range(0, m+1):
+    xCoord = (i/m)*vectors[0][0]+(1-(i/m))*vectors[1][0]
+    yCoord = (i/m)*vectors[0][1]+(1-(i/m))*vectors[1][1]
+    zCoord = (i/(m*m))*vectors[0][2]+((1-i)/(m*m))*vectors[1][2]+2*((i/m)*(1-(i/m))*((vectors[1][1]*vectors[0][0]) - (vectors[1][0]*vectors[0][1])))
+    print(xCoord, " ", yCoord, " ", zCoord)
+    pointSet1.append((xCoord, yCoord, zCoord))
+for i in range(0, m+1):
+    xCoord = (i / m) * vectors[0][0] + (1 - (i / m)) * vectors[1][0]
+    yCoord = (i / m) * vectors[0][1] + (1 - (i / m)) * vectors[1][1]
+    zCoord = (i / (m * m)) * vectors[0][2] + ((1 - i) / (m * m)) * vectors[1][2] + 2 * (
+                (i / m) * (1 - (i / m)) * ((vectors[0][1] * vectors[1][0]) - (vectors[0][0] * vectors[1][1])))
+    #zCoord = (1/(m))+(i/(m*m))*vectors[0][2]+((1-i)/(m*m))*vectors[1][2]+2 * ((i / m) * (1 - (i / m)) * ((vectors[0][1] * vectors[1][0]) - (vectors[0][0] * vectors[1][1])))
+    pointSet2.append((xCoord, yCoord, zCoord))
+sPointsUpper = gl.GLLinePlotItem(pos = pointSet1)
+sPointsLower = gl.GLLinePlotItem(pos = pointSet2)
+view.addItem(sPointsUpper)
+view.addItem(sPointsLower)
+
+view.addItem(points)
+#view.addItem(initials)
+print(len(combSet))
+print(m**3)
 view.show()
